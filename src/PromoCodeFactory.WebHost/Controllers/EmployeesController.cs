@@ -16,9 +16,9 @@ namespace PromoCodeFactory.WebHost.Controllers
     [Route("api/v1/[controller]")]
     public class EmployeesController : ControllerBase
     {
-        private readonly IRepository<Employee> _employeeRepository;
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public EmployeesController(IRepository<Employee> employeeRepository)
+        public EmployeesController(IEmployeeRepository employeeRepository)
         {
             _employeeRepository = employeeRepository;
         }
@@ -69,6 +69,102 @@ namespace PromoCodeFactory.WebHost.Controllers
             };
 
             return employeeModel;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<EmployeeResponse>> CreateEmployee(
+            [FromBody] EmployeeCreateRequest newEmployee) 
+        {
+            Employee employee = new()
+            {
+                Email = newEmployee.Email,
+                FirstName = newEmployee.FirstName,
+                LastName = newEmployee.LastName
+            };
+            
+            Employee responseEmployee = await _employeeRepository.CreateAsync(employee);
+
+            if (responseEmployee != null) 
+            {
+                var employeeModel = new EmployeeResponse()
+                {
+                    Id = responseEmployee.Id,
+                    Email = responseEmployee.Email,
+                    Roles = responseEmployee.Roles.Select(x => new RoleItemResponse()
+                    {
+                        Name = x.Name,
+                        Description = x.Description
+                    }).ToList(),
+                    FullName = responseEmployee.FullName,
+                    AppliedPromocodesCount = responseEmployee.AppliedPromocodesCount
+                };
+
+                return employeeModel;
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<EmployeeResponse>> UpdateEmployee(
+            Guid id,
+            [FromBody] EmployeeUpdateRequest newEmployee) 
+        {
+            Employee employee = new()
+            {
+                Email = newEmployee.Email,
+                FirstName = newEmployee.FirstName,
+                LastName = newEmployee.LastName
+            };
+            
+            Employee responseEmployee = 
+                await _employeeRepository.UpdateAsync(id, employee);
+
+            if (responseEmployee != null) 
+            {
+                var employeeModel = new EmployeeResponse()
+                {
+                    Id = responseEmployee.Id,
+                    Email = responseEmployee.Email,
+                    Roles = responseEmployee.Roles.Select(x => new RoleItemResponse()
+                    {
+                        Name = x.Name,
+                        Description = x.Description
+                    }).ToList(),
+                    FullName = responseEmployee.FullName,
+                    AppliedPromocodesCount = responseEmployee.AppliedPromocodesCount
+                };
+
+                return employeeModel;
+            }
+
+            return BadRequest();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<EmployeeResponse>> DeleteEmployee(Guid id) 
+        {
+            Employee responseEmployee = await _employeeRepository.DeleteAsync(id);
+
+            if (responseEmployee != null) 
+            {
+                var employeeModel = new EmployeeResponse()
+                {
+                    Id = responseEmployee.Id,
+                    Email = responseEmployee.Email,
+                    Roles = responseEmployee.Roles.Select(x => new RoleItemResponse()
+                    {
+                        Name = x.Name,
+                        Description = x.Description
+                    }).ToList(),
+                    FullName = responseEmployee.FullName,
+                    AppliedPromocodesCount = responseEmployee.AppliedPromocodesCount
+                };
+
+                return employeeModel;
+            }
+
+            return BadRequest();
         }
     }
 }
