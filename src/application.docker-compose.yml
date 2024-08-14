@@ -1,0 +1,18 @@
+﻿services:
+
+  webapi:
+    image: promo-code-factory
+    environment:
+      "ASPNETCORE_ENVIRONMENT": "Development"
+      "ASPNETCORE_URLS": "http://+:5100"
+      "ConnectionStrings__DefaultConnection": "Host=postgres;Port=5432;UserId=postgres;Password=password;Database=PromoCodeFactory"
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    ports:
+      - "5101:5100"
+ 
+networks:
+  default:
+    name: myLocalNetwork # создана извне: docker network create --driver=bridge myLocalNetwork
+    external: true
