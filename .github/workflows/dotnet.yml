@@ -24,7 +24,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore $PROJECT_NAME/$PROJECT_NAME.csproj
+      run: dotnet restore src/$PROJECT_NAME/$PROJECT_NAME.csproj
     - name: Build
       run: dotnet build --no-restore
     - name: Test
